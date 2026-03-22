@@ -122,8 +122,6 @@ const DEFAULT_SCRIPT_TEMPLATE = `return {
         {
           sourceId: sourceId || 'main',
           sourceName: '主站',
-          lineId: 'default',
-          lineName: '默认线路',
           episodes: [],
           episodes_titles: []
         }
@@ -131,8 +129,8 @@ const DEFAULT_SCRIPT_TEMPLATE = `return {
     };
   },
 
-  async resolvePlayUrl(ctx, { playUrl, sourceId, lineId, episodeIndex }) {
-    ctx.log.info('resolvePlayUrl', sourceId, lineId, episodeIndex, playUrl);
+  async resolvePlayUrl(ctx, { playUrl, sourceId, episodeIndex }) {
+    ctx.log.info('resolvePlayUrl', sourceId, episodeIndex, playUrl);
     return {
       url: playUrl,
       type: 'auto',
@@ -746,13 +744,19 @@ export function normalizeScriptSearchResults(input: {
             typeof episode === 'string'
               ? episode
               : String(episode?.playUrl || episode?.url || '');
-          return buildScriptPlayUrl({
-            scriptKey: input.scriptKey,
-            sourceId: input.sourceId,
-            lineId: String(episode?.lineId || item?.lineId || 'default'),
-            episodeIndex: index,
-            playUrl,
-          });
+          const needResolve =
+            typeof episode === 'object' && episode
+              ? episode.needResolve !== false
+              : true;
+
+          return needResolve
+            ? buildScriptPlayUrl({
+                scriptKey: input.scriptKey,
+                sourceId: input.sourceId,
+                episodeIndex: index,
+                playUrl,
+              })
+            : playUrl;
         })
       : [];
 
@@ -788,8 +792,6 @@ export function normalizeScriptDetailResult(input: {
         {
           sourceId: input.sourceId,
           sourceName: input.sourceName,
-          lineId: 'default',
-          lineName: '默认线路',
           episodes: input.result?.episodes || [],
           episodes_titles: input.result?.episodes_titles || [],
         },
@@ -800,7 +802,6 @@ export function normalizeScriptDetailResult(input: {
 
   playbacks.forEach((playback: any) => {
     const playbackSourceName = String(playback.sourceName || input.sourceName);
-    const lineName = String(playback.lineName || '默认线路');
     const titles = Array.isArray(playback.episodes_titles)
       ? playback.episodes_titles
       : [];
@@ -817,17 +818,21 @@ export function normalizeScriptDetailResult(input: {
           : String(titles[index] || `第${index + 1}集`);
 
       const playbackSourceId = String(playback.sourceId || input.sourceId);
-      const lineId = String(playback.lineId || 'default');
-      const playUrl = buildScriptPlayUrl({
-        scriptKey: input.scriptKey,
-        sourceId: playbackSourceId,
-        lineId,
-        episodeIndex: index,
-        playUrl: rawPlayUrl,
-      });
+      const needResolve =
+        typeof episode === 'object' && episode
+          ? episode.needResolve !== false
+          : true;
+      const playUrl = needResolve
+        ? buildScriptPlayUrl({
+            scriptKey: input.scriptKey,
+            sourceId: playbackSourceId,
+            episodeIndex: index,
+            playUrl: rawPlayUrl,
+          })
+        : rawPlayUrl;
 
       flattenedEpisodes.push(playUrl);
-      flattenedTitles.push(`${playbackSourceName} / ${lineName} / ${episodeTitle}`);
+      flattenedTitles.push(`${playbackSourceName} / ${episodeTitle}`);
     });
   });
 
@@ -861,8 +866,6 @@ export async function resolveScriptDetailPlaybacks(input: {
         {
           sourceId: input.sourceId,
           sourceName: input.sourceId,
-          lineId: 'default',
-          lineName: '默认线路',
           episodes: input.result?.episodes || [],
           episodes_titles: input.result?.episodes_titles || [],
         },
@@ -882,7 +885,6 @@ export async function resolveScriptDetailPlaybacks(input: {
   const resolvedPlaybacks = await Promise.all(
     playbacks.map(async (playback: any) => {
       const playbackSourceId = String(playback.sourceId || input.sourceId);
-      const lineId = String(playback.lineId || 'default');
       const episodes = Array.isArray(playback.episodes) ? playback.episodes : [];
 
       const resolvedEpisodes = await Promise.all(
@@ -898,7 +900,6 @@ export async function resolveScriptDetailPlaybacks(input: {
                 compiled.resolvePlayUrl(ctx, {
                   playUrl,
                   sourceId: playbackSourceId,
-                  lineId,
                   episodeIndex: index,
                 })
               ),
@@ -941,14 +942,12 @@ function decodeBase64Url(value: string) {
 export function buildScriptPlayUrl(input: {
   scriptKey: string;
   sourceId: string;
-  lineId: string;
   episodeIndex: number;
   playUrl: string;
 }) {
   const searchParams = new URLSearchParams({
     key: input.scriptKey,
     sourceId: input.sourceId,
-    lineId: input.lineId,
     episodeIndex: String(input.episodeIndex),
     playUrl: encodeBase64Url(input.playUrl),
   });
@@ -962,7 +961,6 @@ export function parseScriptPlayUrlValue(value: string) {
 export async function resolveSavedScriptPlayUrl(input: {
   key: string;
   sourceId: string;
-  lineId: string;
   episodeIndex: number;
   playUrl: string;
   configValues?: Record<string, string>;
@@ -983,7 +981,6 @@ export async function resolveSavedScriptPlayUrl(input: {
       compiled.resolvePlayUrl(ctx, {
         playUrl: input.playUrl,
         sourceId: input.sourceId,
-        lineId: input.lineId,
         episodeIndex: input.episodeIndex,
       })
     ),

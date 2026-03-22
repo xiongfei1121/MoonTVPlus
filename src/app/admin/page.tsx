@@ -6278,7 +6278,6 @@ const VideoSourceScriptLab = () => {
           : JSON.stringify(
               {
                 sourceId: 'main',
-                lineId: 'default',
                 playUrl: 'https://example.com/video.m3u8',
                 episodeIndex: 0,
               },
@@ -6469,7 +6468,7 @@ const VideoSourceScriptLab = () => {
                 </select>
               </div>
               <p className='text-xs text-gray-500 dark:text-gray-400'>
-                现在脚本可以自己管理多个源和线路，测试入参可传 `sourceId`、`lineId`。
+                现在脚本可以自己管理多个源，测试入参可传 `sourceId`。
               </p>
               <textarea
                 value={testPayload}

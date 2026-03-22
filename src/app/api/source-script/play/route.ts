@@ -9,7 +9,7 @@ import {
 export const runtime = 'nodejs';
 
 /**
- * GET /api/source-script/play?key=xxx&sourceId=xxx&lineId=xxx&episodeIndex=0&playUrl=base64url&format=json
+ * GET /api/source-script/play?key=xxx&sourceId=xxx&episodeIndex=0&playUrl=base64url&format=json
  * format=json: 返回 JSON 格式（用于 play 页面）
  * 默认: 返回重定向（用于播放器或外部调用）
  */
@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const key = searchParams.get('key');
     const sourceId = searchParams.get('sourceId');
-    const lineId = searchParams.get('lineId') || 'default';
     const episodeIndexRaw = searchParams.get('episodeIndex');
     const playUrlEncoded = searchParams.get('playUrl');
     const format = searchParams.get('format');
@@ -45,7 +44,6 @@ export async function GET(request: NextRequest) {
     const result = await resolveSavedScriptPlayUrl({
       key,
       sourceId,
-      lineId,
       episodeIndex,
       playUrl,
     });

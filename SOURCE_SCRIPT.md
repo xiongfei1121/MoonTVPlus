@@ -42,8 +42,6 @@ return {
         {
           sourceId,
           sourceName: '默认源',
-          lineId: 'default',
-          lineName: '默认线路',
           episodes: [],
           episodes_titles: []
         }
@@ -51,7 +49,7 @@ return {
     };
   },
 
-  async resolvePlayUrl(ctx, { playUrl, sourceId, lineId, episodeIndex }) {
+  async resolvePlayUrl(ctx, { playUrl, sourceId, episodeIndex }) {
     return {
       url: playUrl,
       type: 'auto',
@@ -71,7 +69,7 @@ return {
    推荐
 4. `detail({ id, sourceId })`
    详情
-5. `resolvePlayUrl({ playUrl, sourceId, lineId, episodeIndex })`
+5. `resolvePlayUrl({ playUrl, sourceId, episodeIndex })`
    播放前解析最终地址
 
 ## `ctx` 里能用什么
@@ -128,17 +126,24 @@ return {
     {
       sourceId: 'default',
       sourceName: '默认源',
-      lineId: 'line1',
-      lineName: '线路1',
       episodes: [
         'https://example.com/play/1',
-        'https://example.com/play/2'
+        {
+          playUrl: 'https://example.com/play/2',
+          needResolve: false
+        }
       ],
       episodes_titles: ['第1集', '第2集']
     }
   ]
 }
 ```
+
+说明：
+
+- `episodes` 可以是字符串，默认等价于 `{ playUrl: '...', needResolve: true }`
+- `needResolve` 默认为 `true`
+- 显式写 `needResolve: false` 时，播放页会直接使用该地址，不再调用 `resolvePlayUrl`
 
 ## `resolvePlayUrl` 返回格式
 
@@ -196,4 +201,3 @@ async resolvePlayUrl(ctx, { playUrl }) {
   "code": "return { ... }"
 }
 ```
-
