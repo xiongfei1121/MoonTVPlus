@@ -115,7 +115,7 @@ export const UserMenu: React.FC = () => {
   const [enableOptimization, setEnableOptimization] = useState(true);
   const [speedTestTimeout, setSpeedTestTimeout] = useState(4000); // 测速超时时间（毫秒）
   const [fluidSearch, setFluidSearch] = useState(true);
-  const [tmdbBackdropDisabled, setTmdbBackdropDisabled] = useState(false);
+  const [tmdbBackdropDisabled, setTmdbBackdropDisabled] = useState(true);
   const [enableTrailers, setEnableTrailers] = useState(false);
   const [doubanDataSource, setDoubanDataSource] = useState('cmliussss-cdn-tencent');
   const [doubanDataSourceBackup, setDoubanDataSourceBackup] = useState('direct');
