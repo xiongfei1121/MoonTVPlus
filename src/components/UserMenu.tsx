@@ -1350,7 +1350,7 @@ export const UserMenu: React.FC = () => {
       localStorage.setItem('enableOptimization', JSON.stringify(true));
       localStorage.setItem('fluidSearch', JSON.stringify(defaultFluidSearch));
       localStorage.setItem('liveDirectConnect', JSON.stringify(false));
-      localStorage.setItem('tmdb_backdrop_disabled', 'false');
+      localStorage.setItem('tmdb_backdrop_disabled', 'true');
       localStorage.setItem('enableTrailers', 'false');
       localStorage.setItem('doubanProxyUrl', defaultDoubanProxy);
       localStorage.setItem('doubanDataSource', defaultDoubanProxyType);
