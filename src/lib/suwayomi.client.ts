@@ -75,6 +75,31 @@ export function buildSuwayomiImageProxyUrl(pathOrUrl: string): string {
   return `/api/manga/image?path=${encodeURIComponent(pathOrUrl)}`;
 }
 
+function normalizeMangaStatus(status?: string): string | undefined {
+  if (!status) return undefined;
+
+  const normalized = status.trim().toUpperCase();
+  switch (normalized) {
+    case 'ONGOING':
+      return '连载中';
+    case 'COMPLETED':
+      return '已完结';
+    case 'LICENSED':
+      return '已授权';
+    case 'PUBLISHING_FINISHED':
+      return '已完结';
+    case 'CANCELLED':
+      return '已取消';
+    case 'ON_HIATUS':
+      return '休刊中';
+    case 'UNKNOWN':
+    case 'UNRECOGNIZED':
+      return undefined;
+    default:
+      return status;
+  }
+}
+
 export class SuwayomiClient {
   private options: SuwayomiClientOptions;
 
@@ -210,7 +235,7 @@ export class SuwayomiClient {
           author: manga.author,
           artist: manga.artist,
           genre: manga.genre,
-          status: manga.status,
+          status: normalizeMangaStatus(manga.status),
         });
       }
     }
@@ -292,7 +317,7 @@ export class SuwayomiClient {
         author: manga.author,
         artist: manga.artist,
         genre: manga.genre,
-        status: manga.status,
+        status: normalizeMangaStatus(manga.status),
       })),
     };
   }
@@ -410,7 +435,7 @@ export class SuwayomiClient {
           author: detailData.manga.author || metadata.author,
           artist: detailData.manga.artist,
           genre: detailData.manga.genre,
-          status: detailData.manga.status || metadata.status,
+          status: normalizeMangaStatus(detailData.manga.status) || normalizeMangaStatus(metadata.status),
         };
       }
     } catch {
@@ -427,7 +452,7 @@ export class SuwayomiClient {
       author: metadata.author,
       artist: metadata.artist,
       genre: metadata.genre,
-      status: metadata.status,
+      status: normalizeMangaStatus(metadata.status),
       chapters,
     };
   }
