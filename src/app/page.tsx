@@ -747,8 +747,7 @@ function HomeClient() {
         return (
           <section key='hotTvShows' className='mb-8'>
             <div className='mb-4 flex items-center justify-between'>
-              {/* 首页顶部广告 */}
-              <AdBanner />
+              
               <h2 className='text-xl font-bold text-gray-800 dark:text-gray-200'>
                 热门剧集
               </h2>
@@ -891,7 +890,8 @@ function HomeClient() {
           <BannerCarousel delayLoad={true} />
         </div>
       )}
-
+      {/* 首页顶部广告 - 应该在这里 */}
+      <AdBanner />
       <div className='px-2 sm:px-10 pb-4 sm:pb-8 overflow-visible'>
         <div className='max-w-[95%] mx-auto'>
           {/* 首页内容 */}
