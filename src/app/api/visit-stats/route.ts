@@ -40,11 +40,21 @@ export async function GET() {
   try {
     const storage = getStorage();
     if (!storage) {
-      return NextResponse.json({ error: 'Storage not available' }, { status: 500 });
+      return NextResponse.json({ 
+        error: 'Storage not available',
+        hint: 'Please set NEXT_PUBLIC_STORAGE_TYPE=d1 in environment variables'
+      }, { status: 500 });
     }
 
     const today = getTodayDate();
     const db = (storage as any).db;
+
+    if (!db) {
+      return NextResponse.json({ 
+        error: 'Database not available',
+        hint: 'Storage exists but db property is missing'
+      }, { status: 500 });
+    }
 
     // 查询今日统计
     const result = await db.query(
@@ -72,10 +82,13 @@ export async function GET() {
         uv: 0,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('获取访问统计失败:', error);
     return NextResponse.json(
-      { error: 'Failed to get visit stats' },
+      { 
+        error: 'Failed to get visit stats',
+        details: error?.message || String(error)
+      },
       { status: 500 }
     );
   }
